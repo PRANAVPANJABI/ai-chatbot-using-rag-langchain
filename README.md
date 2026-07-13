@@ -215,7 +215,7 @@ Shows the initial interface where users can upload one or more PDF files.
 
 After selecting the PDF files, the application extracts text, creates chunks, generates embeddings, and builds the FAISS vector database.
 
-![Processing PDFs](assets/screenshots/02-processing-pdfs.png)
+![Processing PDFs](assets/screenshots/02-processing-pdf.png)
 
 ---
 
@@ -223,7 +223,7 @@ After selecting the PDF files, the application extracts text, creates chunks, ge
 
 After processing is complete, the chatbot is ready to answer questions from the uploaded documents.
 
-![PDF Processed](assets/screenshots/03-pdfs-processed.png)
+![PDF Processed](assets/screenshots/03-pdf-processed.png)
 
 ---
 
