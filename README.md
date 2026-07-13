@@ -118,7 +118,7 @@ Generate Final Answer
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/YOUR_GITHUB_USERNAME/ai-chatbot-using-rag-langchain.git
+git clone https://github.com/PRANAVPANJABI/ai-chatbot-using-rag-langchain.git
 ```
 
 ### 2. Navigate to the Project Folder
