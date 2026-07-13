@@ -1,0 +1,32 @@
+# Virtual Environment
+.venv/
+venv/
+
+# Environment Variables
+.env
+
+# Python Cache
+__pycache__/
+*.py[cod]
+*.pyo
+
+# VS Code
+.vscode/
+
+# Streamlit Cache
+.streamlit/
+
+# FAISS Index
+faiss_index/*
+!faiss_index/.gitkeep
+
+# Uploaded PDFs
+pdfs/*
+!pdfs/.gitkeep
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
