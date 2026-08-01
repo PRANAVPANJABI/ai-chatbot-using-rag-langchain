@@ -1,322 +1,118 @@
-# 🤖 AI PDF Chatbot using LangChain & RAG
+# AI PDF Chatbot using LangChain & RAG
 
 ![Python](https://img.shields.io/badge/Python-3.10-blue)
-
 ![Streamlit](https://img.shields.io/badge/Streamlit-App-red)
-
 ![LangChain](https://img.shields.io/badge/LangChain-RAG-green)
-
 ![FAISS](https://img.shields.io/badge/VectorDB-FAISS-orange)
-
 ![Gemini](https://img.shields.io/badge/LLM-Google%20Gemini-blue)
 
 A beginner-friendly AI-powered PDF Question Answering application built with **Python**, **LangChain**, **Google Gemini**, **FAISS**, **Hugging Face Embeddings**, and **Streamlit**.
 
-The application allows users to upload one or more PDF documents, processes them using a Retrieval-Augmented Generation (RAG) pipeline, and answers questions based only on the uploaded documents.
+A document question-answering system that lets users upload one or more PDFs and query them in natural language. Built with a RAG pipeline so that answers are grounded in retrieved document content rather than the full text of the file.
 
-Instead of sending the entire PDF to the Large Language Model (LLM), the application retrieves only the most relevant sections of the document and provides them as context to Gemini, making responses faster, more accurate, and less prone to hallucinations.
+## Overview
 
----
+Reading an entire PDF for every question is inefficient, especially for larger documents. This project first searches for the most relevant parts of the document and then uses only those sections to answer the user's question. This approach improves speed, reduces unnecessary processing, and keeps responses focused on the uploaded content.
 
-## ✨ Features
-
-- 📄 Upload one or more PDF files
-- 📚 Extract text from PDFs
-- ✂️ Split documents into meaningful chunks
-- 🧠 Generate semantic embeddings using Hugging Face
-- 🗂️ Store embeddings in a FAISS vector database
-- 🔍 Retrieve the most relevant document chunks
-- 🤖 Generate context-aware answers using Google Gemini
-- 🌐 Interactive Streamlit web interface
-- ⚡ Beginner-friendly modular project structure
-- 🔒 API key stored securely using `.env`
-
----
-
-## 🛠️ Tech Stack
-
-| Technology | Purpose |
-|------------|---------|
-| Python | Programming Language |
-| Streamlit | Web Application |
-| LangChain | RAG Framework |
-| Google Gemini API | Large Language Model |
-| Hugging Face Embeddings | Text Embeddings |
-| FAISS | Vector Database |
-| PyPDF | PDF Reading |
-| python-dotenv | Environment Variable Management |
-
----
-
-## 📁 Project Structure
-
-```text
-ai-chatbot-using-rag-langchain/
-│
-├── assets/
-│   └── screenshots/
-│
-├── pdfs/
-├── faiss_index/
-├── utils/
-│   ├── pdf_processor.py
-│   ├── vector_store.py
-│   └── chatbot.py
-│
-├── app.py
-├── requirements.txt
-├── README.md
-├── .gitignore
-└── .env
-```
-
----
-
-## 🔄 RAG Pipeline
+## Architecture
 
 ```text
 Upload PDF(s)
       │
       ▼
-Read PDF
+Extract text (PyPDF)
       │
       ▼
-Extract Text
+Split into chunks
       │
       ▼
-Split into Chunks
+Create vector representations (Hugging Face)
       │
       ▼
-Generate Embeddings
+Store in FAISS index
       │
       ▼
-Store in FAISS
+User question → similarity search
       │
       ▼
-User asks Question
+Relevant text + question → Google Gemini API
       │
       ▼
-Convert Question to Embedding
-      │
-      ▼
-Similarity Search
-      │
-      ▼
-Retrieve Relevant Chunks
-      │
-      ▼
-Send Context + Question to Gemini
-      │
-      ▼
-Generate Final Answer
+Answer
 ```
 
----
+The system is split into three modules rather than a single script:
 
-## ⚙️ Installation
+- `pdf_processor.py` — text extraction and chunking
+- `vector_store.py` — embedding generation and FAISS index management
+- `chatbot.py` — retrieval and language model query workflow
 
-### 1. Clone the Repository
+## Tech Stack
+
+| Component | Choice |
+|---|---|
+| language model | Google Gemini API |
+| Orchestration | LangChain |
+| Vector representations | Hugging Face sentence vector representations |
+| Vector store | FAISS |
+| PDF parsing | PyPDF |
+| Interface | Streamlit |
+| Config | python-dotenv |
+
+## Design Decisions
+
+**Using only relevant sections instead of the entire document.** Sending the full PDF on every query doesn't scale past a few pages and increases the surface area for incorrect responses. Retrieving only the top-matching chunks keeps the context focused and reduces token usage per query.
+
+**Why FAISS?** FAISS is lightweight, runs locally, and is a good fit for this desktop project. For larger applications with multiple users, a managed vector database would be a better choice.
+
+**Organized project structure.** Separating PDF processing, vector storage, and chat workflow into distinct modules keeps each concern independently testable and makes it straightforward to swap components (e.g. a different embedding model or vector store) without touching the rest of the pipeline.
+
+## Setup
 
 ```bash
 git clone https://github.com/PRANAVPANJABI/ai-chatbot-using-rag-langchain.git
-```
-
-### 2. Navigate to the Project Folder
-
-```bash
 cd ai-chatbot-using-rag-langchain
-```
 
-### 3. Create a Virtual Environment
-
-**Windows**
-
-```bash
 python -m venv .venv
-```
+# Windows: .venv\Scripts\activate
+# macOS/Linux: source .venv/bin/activate
 
-Activate it:
-
-```bash
-.venv\Scripts\activate
-```
-
-**macOS / Linux**
-
-```bash
-python3 -m venv .venv
-
-source .venv/bin/activate
-```
-
-### 4. Install Required Packages
-
-```bash
 pip install -r requirements.txt
 ```
 
----
-
-## 🔑 Environment Variables
-
-Create a `.env` file in the project root and add your Google Gemini API key.
+Create a `.env` file in the project root:
 
 ```env
 GOOGLE_API_KEY=YOUR_API_KEY
 ```
 
-You can obtain an API key from **Google AI Studio**.
-
-> **Important:** Never upload your `.env` file or API key to GitHub.
-
----
-
-## ▶️ Run the Application
-
-Start the Streamlit server using:
+Run the app:
 
 ```bash
 streamlit run app.py
 ```
 
-The application will automatically open in your default browser.
+## Usage
 
-If it doesn't open automatically, visit:
+1. Upload one or more PDF files through the Streamlit interface.
+2. Wait for text extraction, chunking, and index creation to complete.
+3. Ask a question in natural language.
+4. The system retrieves the most relevant chunks and returns a Gemini-generated answer grounded in that context.
+5. With multiple PDFs uploaded, queries can be answered across documents.
 
-```
-http://localhost:8501
-```
+## Known Limitations
 
----
+- No conversation memory — each query is handled independently of prior turns.
+- No source attribution in the UI — retrieved chunks aren't surfaced alongside the answer.
+- Retrieval is single-strategy (dense vector similarity); no hybrid keyword + semantic search.
+- Local-only; not yet deployed or multi-user.
+- Limited to PDF input; no support for Word, TXT, or PPT documents.
 
-## 📖 How to Use
+## Screenshots
 
-1. Launch the Streamlit application.
-2. Upload one or more PDF files.
-3. Wait for the application to process the documents.
-4. Enter a question related to the uploaded PDFs.
-5. The application retrieves the most relevant information using FAISS.
-6. Google Gemini generates an answer using only the retrieved context.
-7. Read the generated answer directly in the Streamlit interface.
+See `assets/screenshots/` for the upload flow, processing state, and example single- and multi-document Q&A sessions.
 
----
+## Author
 
-## 📸 Application Screenshots
-
-### 1. Home Page
-
-Shows the initial interface where users can upload one or more PDF files.
-
-![Home Page](assets/screenshots/01-home-page.png)
-
----
-
-### 2. Processing Uploaded PDFs
-
-After selecting the PDF files, the application extracts text, creates chunks, generates embeddings, and builds the FAISS vector database.
-
-![Processing PDFs](assets/screenshots/02-processing-pdf.png)
-
----
-
-### 3. PDFs Processed Successfully
-
-After processing is complete, the chatbot is ready to answer questions from the uploaded documents.
-
-![PDF Processed](assets/screenshots/03-pdf-processed.png)
-
----
-
-### 4. Asking a Question
-
-The user enters a natural language question related to the uploaded PDFs.
-
-![Asking Question](assets/screenshots/04-asking-question.png)
-
----
-
-### 5. Answer from a Single PDF
-
-The chatbot retrieves the most relevant chunks from the uploaded document and generates a context-aware answer using Google Gemini.
-
-![Single PDF Answer](assets/screenshots/05-answer-single-pdf.png)
-
----
-
-### 6. Summary of Multiple PDFs
-
-The application combines information from multiple uploaded PDFs and generates a unified summary.
-
-![Multiple PDF Summary](assets/screenshots/06-answer-multiple-pdfs.png)
-
----
-
-### 7. Question Answering Across Multiple PDFs
-
-The chatbot retrieves relevant information from multiple uploaded documents and answers knowledge-based questions using Retrieval-Augmented Generation (RAG).
-
-![Multiple PDF Question Answer](assets/screenshots/07-multiple-pdf-question-answer.png)
-
----
-
-## 🚀 Future Improvements
-
-- Support chat history
-- Add conversation memory
-- Display page numbers with answers
-- Highlight the source text used to generate answers
-- Support additional document formats (Word, TXT, PPT)
-- Deploy the application online
-- Add authentication for multiple users
-- Improve retrieval using Hybrid Search
-- Add streaming responses for faster user experience
-
----
-
-## 📚 What I Learned
-
-While building this project, I gained practical experience with:
-
-- Retrieval-Augmented Generation (RAG)
-- LangChain fundamentals
-- Google Gemini API integration
-- Hugging Face sentence embeddings
-- Vector databases using FAISS
-- Semantic search
-- Document chunking strategies
-- Prompt engineering
-- Streamlit application development
-- Modular Python project structure
-- Debugging real-world AI applications
-
----
-
-## 💡 Interview Questions
-
-This project helped me understand and explain:
-
-- What is Retrieval-Augmented Generation (RAG)?
-- Why can't an LLM directly answer questions from private PDFs?
-- Why do we split documents into chunks?
-- What are embeddings?
-- Why do we use a vector database?
-- What is FAISS?
-- Why use LangChain?
-- Why is semantic search better than keyword search?
-- What happens internally when a user asks a question?
-- Why do we use Prompt Templates?
-
----
-
-## 📄 License
-
-This project is intended for educational and portfolio purposes.
-
----
-
-## 👨‍💻 Author
-
-**Pranav Panjabi**
-
-- GitHub: https://github.com/PRANAVPANJABI
-- LinkedIn: https://www.linkedin.com/in/pranavkumar-panjabi-a16257190/
+**Pranavkumar Panjabi**
+[GitHub](https://github.com/PRANAVPANJABI) · [LinkedIn](https://www.linkedin.com/in/pranavkumar-panjabi)
